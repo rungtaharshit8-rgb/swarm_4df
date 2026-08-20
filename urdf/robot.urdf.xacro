@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="$(arg name)">
+
+    <xacro:include filename="$(find swarm_4df)/urdf/inertial.urdf.xacro" />
+    <xacro:include filename="$(find swarm_4df)/urdf/basicmodel.urdf.xacro" />
+    <xacro:include filename="$(find swarm_4df)/urdf/gazebo.urdf.xacro" />
+    <xacro:include filename="$(find swarm_4df)/urdf/lidar.urdf.xacro" />
+    <xacro:include filename="$(find swarm_4df)/urdf/IMU.urdf.xacro" />
+    <xacro:include filename="$(find swarm_4df)/urdf/camera.urdf.xacro" /> 
+    <!-- <xacro:include filename="$(find swarm_4df)/urdf/depth_cam.urdf.xacro" /> -->
+    <!-- <xacro:include filename="$(find swarm_4df)/urdf/bumper.urdf.xacro" /> -->
+
+    <xacro:arg name="name" default="car"/>
+    <xacro:arg name="prefix" default="" />
+
+    <xacro:car_urdf   prefix="$(arg prefix)" />
+    <xacro:car_gazebo prefix="$(arg prefix)" />  
+   <xacro:car_lidar  prefix="$(arg prefix)" />
+   <xacro:car_imu    prefix="$(arg prefix)"/> 
+ <xacro:car_camera  prefix="$(arg prefix)" />
+</robot>

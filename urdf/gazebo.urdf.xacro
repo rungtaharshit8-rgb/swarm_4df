@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <xacro:macro name="car_gazebo" params="prefix">
+
+        <gazebo>
+            <plugin filename="gz-sim-diff-drive-system" name="gz::sim::systems::DiffDrive">
+                <left_joint>left_wheel_back_joint</left_joint>
+                <right_joint>right_wheel_back_joint</right_joint>
+                <left_joint>left_wheel_front_joint</left_joint>
+                <right_joint>right_wheel_front_joint</right_joint>
+
+                <wheel_separation>0.525</wheel_separation>
+                <wheel_radius>0.05</wheel_radius>
+                <max_wheel_torque>200</max_wheel_torque>
+                <max_wheel_acceleration>10.0</max_wheel_acceleration>
+
+                <odom_frame>${prefix}/odom</odom_frame>
+                <robot_base_frame>${prefix}/base_link</robot_base_frame>
+                <publish_odom>true</publish_odom>
+                <publish_odom_tf>false</publish_odom_tf>
+
+                <!-- Explicit, not left to gz-sim's default: must match
+                     "/model/PREFIX/odometry" exactly, since that's the
+                     literal gz-side topic name ros_gz_bridge_swarm.yaml
+                     bridges into "PREFIX/odom". Relying on the default
+                     here was the actual cause of odom never reaching ROS
+                     for ANY robot - the bridge subscribed to the topic
+                     name we told it to, but gz-sim was never publishing
+                     under that exact name because we never said so. -->
+                <odom_topic>/model/${prefix}/odometry</odom_topic>
+                <topic>/model/${prefix}/cmd_vel</topic>
+            </plugin>
+        </gazebo>
+
+        <gazebo>
+       <plugin filename="gz-sim-joint-state-publisher-system" name="gz::sim::systems::JointStatePublisher">
+    <topic>/model/${prefix}/joint_states</topic>
+        </plugin>
+        </gazebo>
+
+    </xacro:macro>
+
+</robot>

@@ -1,0 +1,215 @@
+# Per-robot Nav2 params for swarm_4df.
+#
+# "__ROBOT_NAME__" is substituted with each robot's name (car1/car2/car3)
+# by nav2_swarm_launch.py before this file is handed to nav2_bringup.
+#
+# Two things changed vs. the original single-robot nav2_params.yaml:
+#   1. every frame_id (base_frame_id, global_frame, robot_base_frame, ...)
+#      is now "__ROBOT_NAME__/..." to match robot_state_publisher's
+#      frame_prefix output. Frame IDs are NOT subject to ROS2 namespace
+#      remapping the way topic names are, so they must stay fully
+#      qualified here.
+#   2. scan_topic / odom_topic / observation topics are RELATIVE (just
+#      "lidar" / "odom", no __ROBOT_NAME__ prefix). nav2_bringup already
+#      launches every one of these nodes inside namespace='/__ROBOT_NAME__'
+#      (see nav2_swarm_launch.py), so ROS2 automatically resolves a
+#      relative topic name to "/<robot>/<topic>" on its own -- matching
+#      the real bridged topic from ros_gz_bridge_swarm.yaml.template.
+#      Prefixing these with __ROBOT_NAME__ as well double-applies the
+#      namespace (e.g. "car1/odom" relative + /car1 namespace ==
+#      /car1/car1/odom, which has zero publishers and silently breaks
+#      TF/costmap/bt_navigator -- confirmed via `ros2 topic info
+#      /car1/car1/odom -v` showing bt_navigator subscribed there with
+#      Publisher count: 0). This mirrors the correct relative-topic
+#      pattern already used in odom_tf_broadcaster.py.
+#
+# amcl is kept (harmless) even though nav2_swarm_launch.py runs with
+# slam:=True, use_localization:=False, so amcl won't actually be
+# launched by bringup_launch.py in that mode -- keeping it here means
+# switching to a saved-map + localization workflow later is a one-flag
+# change, not a rewrite.
+
+amcl:
+  ros__parameters:
+    use_sim_time: True
+    base_frame_id: "__ROBOT_NAME__/base_link"
+    odom_frame_id: "__ROBOT_NAME__/odom"
+    global_frame_id: "__ROBOT_NAME__/map"
+    scan_topic: lidar
+    set_initial_pose: true
+    initial_pose:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      yaw: 0.0
+
+bt_navigator:
+  ros__parameters:
+    use_sim_time: True
+    global_frame: __ROBOT_NAME__/map
+    robot_base_frame: __ROBOT_NAME__/base_link
+    odom_topic: odom
+
+controller_server:
+  ros__parameters:
+    use_sim_time: True
+    controller_frequency: 20.0
+    min_x_velocity_threshold: 0.001
+    min_y_velocity_threshold: 0.5
+    min_theta_velocity_threshold: 0.001
+    progress_checker_plugin: "progress_checker"
+    goal_checker_plugins: ["general_goal_checker"]
+    controller_plugins: ["FollowPath"]
+
+    progress_checker:
+      plugin: "nav2_controller::SimpleProgressChecker"
+      required_movement_radius: 0.5
+      movement_time_allowance: 10.0
+
+    general_goal_checker:
+      stateful: True
+      plugin: "nav2_controller::SimpleGoalChecker"
+      xy_goal_tolerance: 0.25
+      yaw_goal_tolerance: 0.25
+
+    FollowPath:
+      plugin: "nav2_regulated_pure_pursuit_controller::RegulatedPurePursuitController"
+      desired_linear_vel: 0.3
+      max_angular_accel: 3.2
+      lookahead_dist: 0.4
+      min_lookahead_dist: 0.3
+      max_lookahead_dist: 0.6
+      transform_tolerance: 0.5
+
+local_costmap:
+  local_costmap:
+    ros__parameters:
+      use_sim_time: True
+      global_frame: __ROBOT_NAME__/odom
+      robot_base_frame: __ROBOT_NAME__/base_link
+      rolling_window: true
+      width: 3
+      height: 3
+      resolution: 0.05
+      plugins: ["obstacle_layer", "inflation_layer"]
+      obstacle_layer:
+        plugin: "nav2_costmap_2d::ObstacleLayer"
+        enabled: True
+        observation_sources: scan
+        scan:
+          topic: lidar
+          max_obstacle_height: 2.0
+          clearing: True
+          marking: True
+          data_type: "LaserScan"
+      inflation_layer:
+        plugin: "nav2_costmap_2d::InflationLayer"
+        cost_scaling_factor: 3.0
+        inflation_radius: 0.3
+
+global_costmap:
+  global_costmap:
+    ros__parameters:
+      use_sim_time: True
+      global_frame: __ROBOT_NAME__/map
+      robot_base_frame: __ROBOT_NAME__/base_link
+      resolution: 0.05
+      track_unknown_space: true
+      plugins: ["static_layer", "obstacle_layer", "inflation_layer"]
+      static_layer:
+        plugin: "nav2_costmap_2d::StaticLayer"
+        map_subscribe_transient_local: True
+      obstacle_layer:
+        plugin: "nav2_costmap_2d::ObstacleLayer"
+        enabled: True
+        observation_sources: scan
+        scan:
+          topic: lidar
+          max_obstacle_height: 2.0
+          clearing: True
+          marking: True
+          data_type: "LaserScan"
+      inflation_layer:
+        plugin: "nav2_costmap_2d::InflationLayer"
+        cost_scaling_factor: 3.0
+        inflation_radius: 0.3
+
+planner_server:
+  ros__parameters:
+    use_sim_time: True
+    planner_plugins: ["GridBased"]
+    GridBased:
+      plugin: "nav2_navfn_planner::NavfnPlanner"
+      tolerance: 0.5
+      use_astar: false
+      allow_unknown: true
+
+behavior_server:
+  ros__parameters:
+    use_sim_time: True
+    local_frame: __ROBOT_NAME__/odom
+    global_frame: __ROBOT_NAME__/map
+    robot_base_frame: __ROBOT_NAME__/base_link
+    behavior_plugins: ["spin", "backup", "wait"]
+    spin:
+      plugin: "nav2_behaviors::Spin"
+    backup:
+      plugin: "nav2_behaviors::BackUp"
+    wait:
+      plugin: "nav2_behaviors::Wait"
+
+map_server:
+  ros__parameters:
+    use_sim_time: True
+
+map_saver:
+  ros__parameters:
+    use_sim_time: True
+
+# Added after the fact: newer nav2_bringup (Jazzy) includes collision_monitor
+# in its default navigation stack. It has a required parameter
+# (observation_sources) with no default -- without this section, the whole
+# per-robot lifecycle_manager_navigation bringup fails to configure and
+# aborts for ALL nodes in that namespace, not just this one.
+#
+# cmd_vel_in_topic/cmd_vel_out_topic are relative on purpose: this node is
+# namespaced under /<robot>, so "cmd_vel_smoothed" and "cmd_vel" resolve to
+# "<robot>/cmd_vel_smoothed" and "<robot>/cmd_vel" automatically -- matching
+# the velocity_smoother -> collision_monitor -> DiffDrive plugin chain.
+# scan.topic follows the same relative convention (see file header note).
+collision_monitor:
+  ros__parameters:
+    use_sim_time: True
+    base_frame_id: "__ROBOT_NAME__/base_link"
+    odom_frame_id: "__ROBOT_NAME__/odom"
+    cmd_vel_in_topic: "cmd_vel_smoothed"
+    cmd_vel_out_topic: "cmd_vel"
+    state_topic: "collision_monitor_state"
+    transform_tolerance: 0.5
+    source_timeout: 5.0
+    base_shift_correction: True
+    stop_pub_timeout: 2.0
+    polygons: ["PolygonStop"]
+    PolygonStop:
+      type: "polygon"
+      points: "[[0.3, 0.3], [0.3, -0.3], [-0.3, -0.3], [-0.3, 0.3]]"
+      action_type: "stop"
+      max_points: 3
+      visualize: True
+      polygon_pub_topic: "polygon_stop"
+    observation_sources: ["scan"]
+    scan:
+      type: "scan"
+      topic: "lidar"
+
+# Added after the fact: newer nav2_bringup also includes docking_server by
+# default. It hard-refuses to configure with zero dock plugins registered
+# ("Charging dock plugins not given!") -- even though nothing in this swarm
+# actually docks. Registering Nav2's built-in no-op SimpleChargingDock
+# plugin satisfies that check without requiring real dock hardware/poses.
+docking_server:
+  ros__parameters:
+    use_sim_time: True
+    dock_plugins: ["simple_charging_dock"]
+    simple_charging_dock:
+      plugin: "opennav_docking::SimpleChargingDock"

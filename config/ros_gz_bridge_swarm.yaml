@@ -1,0 +1,59 @@
+  # Per-robot ros_gz_bridge block for swarm_4df.
+  #
+  # "__ROBOT_NAME__" is substituted with each robot's name (car1/car2/car3)
+  # by car_swarm_launch.py, which concatenates 3 patched copies of this
+  # block into one temp file and hands it to a single shared
+  # ros_gz_bridge parameter_bridge process -- same "one bridge process for
+  # the whole swarm" design as the original slam_swarm_launch.py, just
+  # generated instead of hand-duplicated 3x.
+  #
+  # gz_topic_name values match gz-sim's REAL auto-generated topic paths
+  # for a robot spawned with -name __ROBOT_NAME__ (confirmed against a
+  # working ros_gz_bridge_swarm.yaml): plugins/sensors use plain relative
+  # topic names in the xacro (see gazebo_urdf.xacro / lidar_urdf.xacro /
+  # IMU_urdf.xacro), and gz-sim scopes them under /model/<name>/... or
+  # /world/<world>/model/<name>/link/<link>/sensor/<sensor>/... on its own.
+  #
+  # "__WORLD_NAME__" is the second placeholder substituted by
+  # car_swarm_launch.py (alongside __ROBOT_NAME__) -- it MUST match the
+  # actual <world name="..."> in whichever .sdf file car_swarm_launch.py
+  # loads. Getting this wrong (e.g. the world file being renamed/swapped
+  # without updating this) means the bridge silently subscribes to a
+  # Gazebo topic that doesn't exist -- no error, just permanently empty
+  # ROS topics for every sensor.
+
+  - ros_topic_name: /__ROBOT_NAME__/cmd_vel
+    gz_topic_name: /model/__ROBOT_NAME__/cmd_vel
+    ros_type_name: geometry_msgs/msg/Twist
+    gz_type_name: gz.msgs.Twist
+    direction: ROS_TO_GZ
+
+  - ros_topic_name: /__ROBOT_NAME__/odom
+    gz_topic_name: /model/__ROBOT_NAME__/odometry
+    ros_type_name: nav_msgs/msg/Odometry
+    gz_type_name: gz.msgs.Odometry
+    direction: GZ_TO_ROS
+
+  - ros_topic_name: /__ROBOT_NAME__/lidar
+    gz_topic_name: /world/multi_room/model/__ROBOT_NAME__/link/lidar_link/sensor/lidar/scan
+    ros_type_name: sensor_msgs/msg/LaserScan
+    gz_type_name: gz.msgs.LaserScan
+    direction: GZ_TO_ROS
+  
+  - ros_topic_name: /__ROBOT_NAME__/imu
+    gz_topic_name: /world/multi_room/model/__ROBOT_NAME__/link/imu_link/sensor/imu/imu
+    ros_type_name: sensor_msgs/msg/Imu
+    gz_type_name: gz.msgs.IMU
+    direction: GZ_TO_ROS  
+
+  - ros_topic_name: /__ROBOT_NAME__/joint_states
+    gz_topic_name: /model/__ROBOT_NAME__/joint_states
+    ros_type_name: sensor_msgs/msg/JointState
+    gz_type_name: gz.msgs.Model
+    direction: GZ_TO_ROS
+  
+  - ros_topic_name: /__ROBOT_NAME__/camera/image_raw
+    gz_topic_name: /world/multi_room/model/__ROBOT_NAME__/link/camera_link/sensor/camera/image
+    ros_type_name: sensor_msgs/msg/Image
+    gz_type_name: gz.msgs.Image
+    direction: GZ_TO_ROS

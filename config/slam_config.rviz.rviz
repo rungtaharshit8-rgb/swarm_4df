@@ -1,0 +1,230 @@
+Panels:
+  - Class: rviz_common/Displays
+    Help Height: 78
+    Name: Displays
+    Property Tree Widget:
+      Expanded:
+        - /Global Options1
+      Splitter Ratio: 0.5
+    Tree Height: 348
+  - Class: rviz_common/Selection
+    Name: Selection
+  - Class: rviz_common/Tool Properties
+    Expanded:
+      - /2D Goal Pose1
+      - /Publish Point1
+    Name: Tool Properties
+    Splitter Ratio: 0.5886790156364441
+  - Class: rviz_common/Views
+    Expanded:
+      - /Current View1
+    Name: Views
+    Splitter Ratio: 0.5
+  - Class: rviz_common/Time
+    Experimental: false
+    Name: Time
+    SyncMode: 0
+    SyncSource: ""
+Visualization Manager:
+  Class: ""
+  Displays:
+    - Alpha: 0.5
+      Cell Size: 1
+      Class: rviz_default_plugins/Grid
+      Color: 160; 160; 164
+      Enabled: true
+      Line Style:
+        Line Width: 0.029999999329447746
+        Value: Lines
+      Name: Grid
+      Normal Cell Count: 0
+      Offset:
+        X: 0
+        Y: 0
+        Z: 0
+      Plane: XY
+      Plane Cell Count: 20
+      Reference Frame: world
+      Value: true
+
+    # Each robot's own live SLAM map, anchored at its own "<name>/map"
+    # frame. Works the same whether that frame comes from a static TF
+    # (static_map_tf:=true) or from the swarm_4df_map_merge node
+    # (static_map_tf:=false) -- this view doesn't care which.
+    # ---------------- car1 ----------------
+    - Alpha: 0.699999988079071
+      Class: rviz_default_plugins/Map
+      Color Scheme: map
+      Enabled: true
+      Name: Map car1
+      Topic:
+        Value: /car1/map
+      Value: true
+    - Alpha: 1
+      Class: rviz_default_plugins/RobotModel
+      Description Source: Topic
+      Description Topic:
+        Value: /car1/robot_description
+      Enabled: true
+      Name: RobotModel car1
+      TF Prefix: car1
+      Value: true
+      Visual Enabled: true
+    - Alpha: 1
+      Autocompute Intensity Bounds: true
+      Class: rviz_default_plugins/LaserScan
+      Color: 255; 0; 0
+      Color Transformer: FlatColor
+      Enabled: true
+      Name: LaserScan car1
+      Size (m): 0.05000000074505806
+      Style: Flat Squares
+      Topic:
+        Value: /car1/lidar
+      Value: true
+
+    # ---------------- car2 ----------------
+    - Alpha: 0.699999988079071
+      Class: rviz_default_plugins/Map
+      Color Scheme: map
+      Enabled: true
+      Name: Map car2
+      Topic:
+        Value: /car2/map
+      Value: true
+    - Alpha: 1
+      Class: rviz_default_plugins/RobotModel
+      Description Source: Topic
+      Description Topic:
+        Value: /car2/robot_description
+      Enabled: true
+      Name: RobotModel car2
+      TF Prefix: car2
+      Value: true
+      Visual Enabled: true
+    - Alpha: 1
+      Autocompute Intensity Bounds: true
+      Class: rviz_default_plugins/LaserScan
+      Color: 0; 255; 0
+      Color Transformer: FlatColor
+      Enabled: true
+      Name: LaserScan car2
+      Size (m): 0.05000000074505806
+      Style: Flat Squares
+      Topic:
+        Value: /car2/lidar
+      Value: true
+
+    # ---------------- car3 ----------------
+    - Alpha: 0.699999988079071
+      Class: rviz_default_plugins/Map
+      Color Scheme: map
+      Enabled: true
+      Name: Map car3
+      Topic:
+        Value: /car3/map
+      Value: true
+    - Alpha: 1
+      Class: rviz_default_plugins/RobotModel
+      Description Source: Topic
+      Description Topic:
+        Value: /car3/robot_description
+      Enabled: true
+      Name: RobotModel car3
+      TF Prefix: car3
+      Value: true
+      Visual Enabled: true
+    - Alpha: 1
+      Autocompute Intensity Bounds: true
+      Class: rviz_default_plugins/LaserScan
+      Color: 0; 0; 255
+      Color Transformer: FlatColor
+      Enabled: true
+      Name: LaserScan car3
+      Size (m): 0.05000000074505806
+      Style: Flat Squares
+      Topic:
+        Value: /car3/lidar
+      Value: true
+
+    # Optional: the flattened ORB-merged map, only published when
+    # car_swarm_launch.py is run with static_map_tf:=false. Left enabled
+    # but harmless (just stays empty) in static_map_tf:=true mode.
+    - Alpha: 0.5
+      Class: rviz_default_plugins/Map
+      Color Scheme: map
+      Enabled: true
+      Name: Merged /map (map_merge mode only)
+      Topic:
+        Value: /map
+      Value: true
+
+    - Class: rviz_default_plugins/TF
+      Enabled: true
+      Frames:
+        All Enabled: true
+      Marker Scale: 1
+      Name: TF
+      Show Arrows: true
+      Show Axes: true
+      Show Names: true
+      Value: true
+  Enabled: true
+  Global Options:
+    Background Color: 48; 48; 48
+    Fixed Frame: world
+    Frame Rate: 30
+  Name: root
+  Tools:
+    - Class: rviz_default_plugins/Interact
+      Hide Inactive Objects: true
+    - Class: rviz_default_plugins/MoveCamera
+    - Class: rviz_default_plugins/Select
+    - Class: rviz_default_plugins/FocusCamera
+    - Class: rviz_default_plugins/Measure
+      Line color: 128; 128; 0
+    - Class: rviz_default_plugins/SetInitialPose
+      Topic:
+        Value: /initialpose
+    - Class: rviz_default_plugins/SetGoal
+      Topic:
+        Value: /goal_pose
+    - Class: rviz_default_plugins/PublishPoint
+      Single click: true
+      Topic:
+        Value: /clicked_point
+  Transformation:
+    Current:
+      Class: rviz_default_plugins/TF
+  Value: true
+  Views:
+    Current:
+      Class: rviz_default_plugins/Orbit
+      Distance: 12
+      Focal Point:
+        X: 1
+        Y: 0.5
+        Z: 0
+      Name: Current View
+      Pitch: 0.78
+      Target Frame: world
+      Value: Orbit (rviz)
+      Yaw: 0.78
+    Saved: ~
+Window Geometry:
+  Displays:
+    collapsed: false
+  Height: 846
+  Hide Left Dock: false
+  Hide Right Dock: false
+  Selection:
+    collapsed: false
+  Time:
+    collapsed: false
+  Tool Properties:
+    collapsed: false
+  Views:
+    collapsed: false
+  Width: 1200
+  X: 954
+  Y: 166
