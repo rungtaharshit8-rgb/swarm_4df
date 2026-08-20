@@ -10,7 +10,7 @@ Repository: https://github.com/rungtaharshit8-rgb/swarm_4df
 - **LiDAR** — sensor is integrated and streaming data on each robot.
 - **Camera** — sensor is integrated and streaming data on each robot.
 - **IMU** — sensor is integrated and streaming data on each robot.
-- **Teleoperation** — each car/robot in the swarm can be driven individually using keyboard teleop.
+- **teleop_twist_keyboard** — each car/robot in the swarm can be driven individually using teleop_twist_keyboard.
 
 ### 🚧 In Progress
 - **LiDAR integration** across the full swarm (beyond per-robot sensing) is being prepared.
@@ -28,7 +28,7 @@ Each robot ("car") in the swarm is equipped with:
 ## Usage
 
 ### Teleoperation (per robot)
-Each car can currently be controlled independently via keyboard teleop:
+Each car can currently be controlled independently via teleop_twist_keyboard:
 
 ```bash
 # example — adjust to match your actual launch/package names
